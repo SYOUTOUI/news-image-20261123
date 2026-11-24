@@ -15,23 +15,23 @@ Referral: https://make.fun/r/nde51zwq
 
 ## What the image shows
 
-- **23 NOVEMBER 2026 — THE WORLD IN ONE DAY**
-- NVIDIA brings back Huang — shares jump about 30% as Jensen Huang returns as CEO.
-- Ukraine hits Russian ships — seven sea drones sink a warship off Libya; cargo ship Angara hit.
-- COP31 ends with no deal — climate talks in Antalya collapse over fossil fuels.
-- Belgium strike grounds flights — national strike cancels nearly all flights at Brussels and Charleroi.
-- Houthis hit Saudi refinery — Yemen's Houthis claim an attack on a Red Sea oil refinery.
-- Indonesia factory fire — 24 killed, 34 missing in a Banten candy factory fire.
+- **23 NOVEMBER 2026 · MONDAY — THE WORLD IN ONE DAY**
+- NVIDIA — Huang returns as CEO, shares jump about 30%.
+- Ukraine — sea drones sink a Russian warship off Libya.
+- Climate — COP31 in Antalya ends with no deal.
+- Belgium — national strike grounds nearly all flights.
+- Red Sea — Houthis claim an attack on a Saudi refinery.
+- Indonesia — factory fire kills 24, 34 missing.
 
-Sources: public news coverage of 23 November 2026 (Daily Mirror,
-Underlines, Broadcast Prism, Pollar, Seldon Report).
+Sources: public news coverage of 23 November 2026.
 
 ## How it works
 
 `main.py` (Python 3.13, standard library only, no network) copies the bundled
-image `asset/entry.png` to `/output/entry.png`. The output is byte-identical
-on every run. `render.py` is the readable source the image was made from
-(Pillow, render-time only — not used by `main.py`).
+image `asset/entry.png` to `/output/entry.png`, checking the PNG magic bytes,
+the 1024x1024 size and the 1 MiB limit first, then re-reading the output to
+confirm it is byte-identical. `render.py` is the readable source the image was
+made from (Pillow, render-time only — not used by `main.py`).
 
 - Output: 1024 x 1024 px PNG (limit: 1024 x 1024, 1 MiB).
 - Verified: two consecutive runs produce identical SHA-256.

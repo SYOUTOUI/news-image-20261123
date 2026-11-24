@@ -1,24 +1,49 @@
-"""news-image-20261123: sum up 23 November 2026's world news in one image.
+#!/usr/bin/env python3
+"""Entry point for the news-image-20261123 bounty.
 
-Deterministic, offline, standard library only.
-Writes the bundled image (asset/entry.png, rendered by render.py)
-to /output/entry.png, byte for byte.
+Reads the bundled newspaper image and writes it to /output/entry.png.
+Standard library only, no network access.
+Requires Python 3.13.
 """
 
-import shutil
-from pathlib import Path
+import hashlib
+import os
+import sys
 
-HERE = Path(__file__).resolve().parent
-ASSET = HERE / "asset" / "entry.png"
-OUTPUT = Path("/output") / "entry.png"
+SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "asset", "entry.png")
+DST = "/output/entry.png"
+MAX_BYTES = 1024 * 1024
+PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 
 
-def main() -> None:
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ASSET, OUTPUT)
-    # Fail loudly instead of shipping a truncated file.
-    if OUTPUT.stat().st_size != ASSET.stat().st_size:
-        raise RuntimeError("output size does not match bundled image")
+def fail(message):
+    print(f"error: {message}", file=sys.stderr)
+    raise SystemExit(1)
+
+
+def main():
+    if not os.path.isfile(SRC):
+        fail(f"bundled image missing: {SRC}")
+    with open(SRC, "rb") as handle:
+        data = handle.read()
+    if len(data) == 0:
+        fail("bundled image is empty")
+    if len(data) > MAX_BYTES:
+        fail(f"bundled image is {len(data)} bytes, over the 1 MiB limit")
+    if data[:8] != PNG_MAGIC:
+        fail("bundled image is not a PNG file")
+    if data[16:24] != b"\x00\x00\x04\x00\x00\x00\x04\x00":
+        fail("bundled image is not 1024x1024")
+    if len(data) < 1000:
+        fail("bundled image looks truncated")
+    os.makedirs(os.path.dirname(DST), exist_ok=True)
+    with open(DST, "wb") as handle:
+        handle.write(data)
+    with open(DST, "rb") as handle:
+        written = handle.read()
+    if hashlib.sha256(written).hexdigest() != hashlib.sha256(data).hexdigest():
+        fail("output differs from the bundled image")
+    print(f"wrote {DST} ({len(written)} bytes)")
 
 
 if __name__ == "__main__":
